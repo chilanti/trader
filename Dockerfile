@@ -14,14 +14,24 @@
 
 # FROM open-liberty:microProfile2
 FROM websphere-liberty:microProfile2
-COPY src/main/liberty/config /config/
+USER root
+RUN ls /config
+RUN tar -cvf config.tar config
+RUN rm -rf /config
+RUN mkdir /config
+RUN tar -xvf config.tar
+RUN chmod ugo+rwx /config
+COPY src/main/liberty/config/* /config/
+
+
+#COPY src/main/liberty/config /config/
 COPY target/trader-1.0-SNAPSHOT.war /config/apps/TraderUI.war
 
 #apt-get needs root access
-USER root
+#USER root
 RUN chmod g+w /config/apps
 RUN apt-get update
 RUN apt-get install curl -y
-USER 1001
+#USER 1001
 
 RUN installUtility install --acceptLicense defaultServer
